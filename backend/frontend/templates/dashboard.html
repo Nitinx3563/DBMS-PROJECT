@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="flex justify-between mt-2" style="margin-bottom: 2rem;">
+    <h1>User Dashboard</h1>
+    <a href="{{ url_for('add_car') }}" class="btn btn-primary">+ List a New Car</a>
+</div>
+
+<div class="dashboard-layout">
+    <div class="sidebar glass" style="height: auto;">
+        <h3 style="margin-bottom: 1rem;">Welcome, {{ session.name }}</h3>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Role: {{ session.role | capitalize }}</p>
+
+        <nav style="flex-direction: column; background: none; padding: 0; align-items: flex-start; position: static;">
+            <a href="#" style="margin: 0.5rem 0;">My Listings</a>
+            <a href="#" style="margin: 0.5rem 0;">My Messages</a>
+            <a href="#" style="margin: 0.5rem 0;">Analytics</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h2 style="margin-bottom: 1.5rem;">Your Active Listings</h2>
+        <div class="card-grid">
+            {% for listing in listings %}
+            <div class="glass">
+                <div class="flex justify-between">
+                    <h3>{{ listing.brand }} {{ listing.model }}</h3>
+                    <span class="badge"
+                        style="background: {{ '#22c55e' if listing.status == 'available' else '#ef4444' }};">
+                        {{ listing.status | capitalize }}
+                    </span>
+                </div>
+                <p style="color: var(--text-muted); margin: 0.5rem 0;">Year: {{ listing.year }} | Price: ${{
+                    listing.price }}</p>
+                <div class="flex" style="margin-top: 1rem;">
+                    <a href="{{ url_for('car_details', listing_id=listing.listing_id) }}" class="btn"
+                        style="background: var(--glass-border); flex: 1; text-align: center;">View</a>
+                </div>
+            </div>
+            {% else %}
+            <p style="grid-column: 1/-1;" class="text-center glass">You haven't listed any cars yet.</p>
+            {% endfor %}
+        </div>
+
+        <h2 style="margin-top: 3rem; margin-bottom: 1.5rem;">Recent Messages</h2>
+        <div class="glass">
+            {% for msg in messages %}
+            <div style="border-bottom: 1px solid var(--glass-border); padding: 1rem 0;">
+                <div class="flex justify-between">
+                    <strong>From: {{ msg.sender_name }}</strong>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">{{ msg.timestamp }}</span>
+                </div>
+                <p style="margin-top: 0.5rem;">{{ msg.message }}</p>
+            </div>
+            {% else %}
+            <p class="text-center" style="color: var(--text-muted);">No messages yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

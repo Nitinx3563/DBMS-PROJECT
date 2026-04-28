@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="hero text-center" style="padding: 6rem 0;">
+    <h1 style="font-size: 4rem; margin-bottom: 1rem;">The Smarter Way to <br><span style="color: var(--primary);">Buy &
+            Sell</span> Used Cars.</h1>
+    <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem;">
+        Get AI-powered price predictions based on real market data. Browse verified listings and connect with sellers
+        instantly.
+    </p>
+    <div class="flex" style="justify-content: center;">
+        <a href="{{ url_for('search') }}" class="btn btn-primary">Browse Cars</a>
+        <a href="{{ url_for('add_car') }}" class="glass" style="text-decoration: none; color: white;">List Your Car</a>
+    </div>
+</div>
+
+<h2 class="mt-2">Featured Listings</h2>
+<div class="card-grid">
+    {% for car in listings %}
+    <div class="glass car-card">
+        <div
+            style="height: 180px; background: #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <span style="color: var(--text-muted);">Car Image Placeholder</span>
+        </div>
+        <div class="flex justify-between">
+            <h3>{{ car.brand }} {{ car.model }}</h3>
+            <span class="badge">{{ car.condition }}</span>
+        </div>
+        <p style="color: var(--text-muted);">{{ car.year }} | {{ car.fuel_type }} | {{ car.mileage }} km</p>
+        <div class="flex justify-between" style="margin-top: 1rem;">
+            <h2 style="color: var(--primary);">${{ car.price }}</h2>
+            <a href="{{ url_for('car_details', listing_id=car.listing_id) }}" class="btn"
+                style="background: var(--glass-border);">Details</a>
+        </div>
+    </div>
+    {% else %}
+    <p>No listings available yet.</p>
+    {% endfor %}
+</div>
+
+{% if recommendations %}
+<div class="flex justify-between mt-4">
+    <h2>Recommended Cars (Best Value)</h2>
+    <span class="badge" style="background: var(--primary);">DAA Greedy Picking</span>
+</div>
+<div class="card-grid">
+    {% for car in recommendations %}
+    <div class="glass car-card" style="border: 1px solid var(--primary);">
+        <div class="flex justify-between">
+            <h3>{{ car.brand }} {{ car.model }}</h3>
+            <span class="badge">Value: {{ "%.2f"|format(car.value_score) }}</span>
+        </div>
+        <p style="color: var(--text-muted);">{{ car.year }} | ${{ car.price }} | {{ car.condition }}</p>
+        <div class="flex justify-between" style="margin-top: 1rem;">
+            <p style="font-size: 0.8rem; color: var(--primary);">Greedy Optimized match</p>
+            <a href="{{ url_for('car_details', listing_id=car.listing_id) }}" class="btn"
+                style="background: var(--primary); color: black;">Details</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

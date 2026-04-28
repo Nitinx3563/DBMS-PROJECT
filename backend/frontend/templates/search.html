@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="flex justify-between mt-2" style="align-items: flex-end;">
+    <div>
+        <h1>Search Marketplace</h1>
+        <p style="color: var(--text-muted);">Find the perfect second-hand car at the best price.</p>
+    </div>
+</div>
+
+<div class="glass mt-2" style="margin-bottom: 3rem;">
+    <form method="GET" action="{{ url_for('search') }}" class="flex" style="flex-wrap: wrap; gap: 1rem;">
+        <div style="flex: 1; min-width: 200px;">
+            <label>Brand</label>
+            <input type="text" name="brand" placeholder="Search brand..." value="{{ request.args.get('brand', '') }}">
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+            <label>Max Price ($)</label>
+            <input type="number" name="max_price" placeholder="Up to..."
+                value="{{ request.args.get('max_price', '') }}">
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+            <label>Fuel Type</label>
+            <select name="fuel_type">
+                <option value="">Any</option>
+                <option value="Petrol" {% if request.args.get('fuel_type')=='Petrol' %}selected{% endif %}>Petrol
+                </option>
+                <option value="Diesel" {% if request.args.get('fuel_type')=='Diesel' %}selected{% endif %}>Diesel
+                </option>
+                <option value="Electric" {% if request.args.get('fuel_type')=='Electric' %}selected{% endif %}>Electric
+                </option>
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+            <label>Sort By</label>
+            <select name="sort_by">
+                <option value="newest" {% if request.args.get('sort_by')=='newest' %}selected{% endif %}>Newest First</option>
+                <option value="price_low" {% if request.args.get('sort_by')=='price_low' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_high" {% if request.args.get('sort_by')=='price_high' %}selected{% endif %}>Price: High to Low</option>
+                <option value="mileage_low" {% if request.args.get('sort_by')=='mileage_low' %}selected{% endif %}>Lowest Mileage</option>
+            </select>
+        </div>
+        <div style="display: flex; align-items: flex-end;">
+            <button type="submit" class="btn btn-primary">Find Cars</button>
+        </div>
+    </form>
+</div>
+
+<div class="card-grid">
+    {% for car in results %}
+    <div class="glass car-card">
+        <div
+            style="height: 160px; background: #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <span style="color: var(--text-muted);">No Image</span>
+        </div>
+        <h3 style="margin-bottom: 0.3rem;">{{ car.brand }} {{ car.model }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            {{ car.year }} | {{ car.mileage }} km | {{ car.location }}
+        </p>
+        <div class="flex justify-between" style="margin-top: 1.5rem;">
+            <h2 style="color: var(--primary);">${{ car.price }}</h2>
+            <a href="{{ url_for('car_details', listing_id=car.listing_id) }}" class="btn"
+                style="background: var(--glass-border);">View Details</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center glass" style="grid-column: 1/-1; padding: 4rem;">
+        <p style="color: var(--text-muted); font-size: 1.2rem;">No cars matching your criteria. Try adjusting the
+            filters!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

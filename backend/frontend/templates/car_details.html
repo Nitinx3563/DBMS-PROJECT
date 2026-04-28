@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="flex" style="margin-top: 2rem; gap: 2.5rem; flex-wrap: wrap;">
+    <!-- Left Column: Media & Specs -->
+    <div style="flex: 2; min-width: 350px;">
+        <div class="glass"
+            style="height: 400px; display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
+            <h1 style="color: var(--text-muted); opacity: 0.3; font-size: 3rem;">{{ car.brand }} {{ car.model }}</h1>
+        </div>
+
+        <h2>Car Specifications</h2>
+        <div class="glass card-grid"
+            style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-top: 1rem;">
+            <div><label>Engine</label>
+                <p>{{ car.engine }}</p>
+            </div>
+            <div><label>Transmission</label>
+                <p>{{ car.transmission }}</p>
+            </div>
+            <div><label>Fuel Type</label>
+                <p>{{ car.fuel_type }}</p>
+            </div>
+            <div><label>Year</label>
+                <p>{{ car.year }}</p>
+            </div>
+            <div><label>Mileage</label>
+                <p>{{ car.mileage }} km</p>
+            </div>
+            <div><label>Color</label>
+                <p>{{ car.color }}</p>
+            </div>
+            <div><label>Seats</label>
+                <p>{{ car.seats }}</p>
+            </div>
+            <div><label>Condition</label>
+                <p>{{ car.condition }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Pricing & Interaction -->
+    <div style="flex: 1; min-width: 300px;">
+        <div class="glass" style="position: sticky; top: 120px;">
+            <p style="color: var(--text-muted); margin-bottom: 0.5rem;">Asking Price</p>
+            <h1 style="font-size: 3.5rem; color: var(--primary); margin-bottom: 1rem;">${{ car.price }}</h1>
+
+            <div
+                style="background: rgba(99, 102, 241, 0.1); padding: 1rem; border-radius: 12px; border: 1px dashed var(--primary); margin-bottom: 2rem;">
+                <p style="font-size: 0.9rem;"><strong>AI Price Prediction:</strong></p>
+                <p style="font-size: 1.2rem; font-weight: 800;">${{ "%.2f"|format(car.predicted_price) }}</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">*Based on historical
+                    marketplace averages for this model and year.</p>
+            </div>
+
+            {% if session.user_id %}
+            {% if session.user_id != car.seller_id %}
+            {% if car.status == 'available' %}
+            <form action="{{ url_for('buy_car', listing_id=car.listing_id) }}" method="POST">
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; padding: 1.2rem; font-size: 1.2rem;">Purchase This Car</button>
+            </form>
+            {% else %}
+            <button class="btn" style="width: 100%; padding: 1.2rem; background: #ef4444; color: white;" disabled>SOLD
+                OUT</button>
+            {% endif %}
+
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Inquire Seller</h3>
+            <form action="{{ url_for('send_message', listing_id=car.listing_id) }}" method="POST">
+                <input type="hidden" name="receiver_id" value="{{ car.seller_id }}">
+                <textarea name="message" rows="4" placeholder="Type your message to {{ car.seller_name }}..."
+                    required></textarea>
+                <button type="submit" class="btn"
+                    style="width: 100%; margin-top: 1rem; background: var(--glass-border);">Send Message</button>
+            </form>
+            {% else %}
+            <div class="alert alert-success">This is your listing.</div>
+            {% endif %}
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary" style="width: 100%; text-align: center;">Login to
+                Purchase</a>
+            {% endif %}
+
+            <div style="margin-top: 2rem; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
+                <p><strong>Seller:</strong> {{ car.seller_name }}</p>
+                <p><strong>Location:</strong> {{ car.location }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mt-2">Seller Reviews</h2>
+<div class="glass mt-2">
+    {% for review in reviews %}
+    <div style="border-bottom: 1px solid var(--glass-border); padding: 1.5rem 0;">
+        <div class="flex">
+            <span style="color: #fbbf24; font-size: 1.2rem;">{{ "★" * review.rating }}{{ "☆" * (5 - review.rating)
+                }}</span>
+            <span style="color: var(--text-muted);">- Buyer {{ review.buyer_id }}</span>
+        </div>
+        <p style="margin-top: 0.5rem;">{{ review.comment }}</p>
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No reviews for this seller yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
